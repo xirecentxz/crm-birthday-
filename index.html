@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM Birthday Pro</title>
+    <title>CRM Birthday Pro - Monthly View</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/3.4.4/luxon.min.js"></script>
@@ -12,24 +12,22 @@
     <div class="max-w-6xl mx-auto p-4 md:p-8">
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
             <div>
-                <h1 class="text-3xl font-black text-slate-800 tracking-tight">🎂 CRM BIRTHDAY PRO</h1>
-                <p class="text-slate-500">Upload, Filter, dan Download Data Customer VIP</p>
+                <h1 class="text-3xl font-black text-slate-800 tracking-tight italic text-blue-600">CRM BIRTHDAY PRO</h1>
+                <p class="text-slate-500 font-medium">Monitoring Ulang Tahun Customer (30 Hari ke Depan)</p>
             </div>
             <div id="downloadArea" class="hidden">
-                <button onclick="downloadExcel()" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-emerald-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d=" virus 4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Download Excel (.xlsx)
+                <button onclick="downloadExcel()" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-emerald-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    Export to Excel
                 </button>
             </div>
         </div>
         
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6">
             <div class="flex items-center justify-center w-full">
-                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-300 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition-all">
+                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-blue-100 border-dashed rounded-xl cursor-pointer bg-blue-50/30 hover:bg-blue-50 transition-all">
                     <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                        <p id="fileStatus" class="mb-2 text-sm text-slate-500 font-semibold text-center px-4">Klik untuk Upload Database Excel Anda</p>
+                        <p id="fileStatus" class="mb-2 text-sm text-blue-600 font-bold text-center px-4 uppercase tracking-wider">Pilih Database Excel (.xlsx)</p>
                         <p class="text-xs text-slate-400 font-mono italic" id="fileNameDisp"></p>
                     </div>
                     <input type="file" id="excelFile" accept=".xlsx, .xls" class="hidden" />
@@ -37,52 +35,79 @@
             </div>
         </div>
 
-        <div id="controls" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div class="relative">
-                <input type="text" id="searchInput" placeholder="Cari nama customer..." class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-                <div class="absolute left-3 top-3.5 text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 hidden" id="statsArea">
+            <div class="bg-rose-500 p-6 rounded-2xl text-white shadow-xl">
+                <p class="text-rose-100 text-xs font-bold uppercase tracking-widest mb-1">Schedule</p>
+                <h2 class="text-4xl font-black italic">TODAY</h2>
+                <div class="mt-4 flex justify-between items-end">
+                    <span id="count-today" class="text-5xl font-light">0</span>
+                    <span class="text-xs bg-rose-400 px-2 py-1 rounded">Hari Ini</span>
                 </div>
             </div>
-            <select id="statusFilter" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none appearance-none bg-white">
-                <option value="ALL">Semua Kategori (H=0 s/d Potensi)</option>
-                <option value="Hari Ini">Hari Ini (H=0)</option>
-                <option value="Segera Follow Up">Follow Up (-1 s/d -3)</option>
-                <option value="Potensi Birthday">Potensi (1 s/d -7)</option>
+            <div class="bg-amber-500 p-6 rounded-2xl text-white shadow-xl">
+                <p class="text-amber-100 text-xs font-bold uppercase tracking-widest mb-1">Schedule</p>
+                <h2 class="text-4xl font-black italic">THIS WEEK</h2>
+                <div class="mt-4 flex justify-between items-end">
+                    <span id="count-week" class="text-5xl font-light">0</span>
+                    <span class="text-xs bg-amber-400 px-2 py-1 rounded">7 Hari Kedepan</span>
+                </div>
+            </div>
+            <div class="bg-blue-600 p-6 rounded-2xl text-white shadow-xl">
+                <p class="text-blue-100 text-xs font-bold uppercase tracking-widest mb-1">Schedule</p>
+                <h2 class="text-4xl font-black italic">THIS MONTH</h2>
+                <div class="mt-4 flex justify-between items-end">
+                    <span id="count-month" class="text-5xl font-light">0</span>
+                    <span class="text-xs bg-blue-500 px-2 py-1 rounded">30 Hari Kedepan</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="controls" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div class="relative">
+                <input type="text" id="searchInput" placeholder="Cari nama..." class="w-full pl-10 pr-4 py-4 rounded-xl border-none shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                <div class="absolute left-3 top-4.5 text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                </div>
+            </div>
+            <select id="statusFilter" class="w-full px-4 py-4 rounded-xl border-none shadow-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-bold text-slate-600">
+                <option value="ALL">Tampilkan Semua (1 Bulan)</option>
+                <option value="TODAY">Filter: TODAY</option>
+                <option value="THIS WEEK">Filter: THIS WEEK</option>
+                <option value="THIS MONTH">Filter: THIS MONTH</option>
             </select>
         </div>
 
-        <div id="tableContainer" class="hidden bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        <div id="tableContainer" class="hidden bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-800 text-white">
-                        <tr>
-                            <th class="px-6 py-4 text-xs font-bold uppercase">Nama Customer</th>
-                            <th class="px-6 py-4 text-xs font-bold uppercase">WhatsApp</th>
-                            <th class="px-6 py-4 text-xs font-bold uppercase">Ulang Tahun</th>
-                            <th class="px-6 py-4 text-xs font-bold uppercase">Status</th>
-                            <th class="px-6 py-4 text-xs font-bold uppercase text-center">Action</th>
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-100">
+                            <th class="px-8 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Customer Name</th>
+                            <th class="px-8 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest text-center text-blue-600">H-Days</th>
+                            <th class="px-8 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Date</th>
+                            <th class="px-8 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Category</th>
+                            <th class="px-8 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Contact</th>
                         </tr>
                     </thead>
-                    <tbody id="resultBody" class="divide-y divide-slate-100"></tbody>
+                    <tbody id="resultBody" class="divide-y divide-slate-50"></tbody>
                 </table>
             </div>
-            <div id="noData" class="hidden p-10 text-center text-slate-400 italic">Data tidak ditemukan...</div>
+            <div id="noData" class="hidden p-20 text-center">
+                <p class="text-slate-300 text-xl font-medium">Tidak ada data yang cocok dengan filter...</p>
+            </div>
         </div>
     </div>
 
     <script>
         const monthMap = {'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, 'June': 6, 'July': 7, 'August': 8, 'September': 9, 'October': 10, 'November': 11, 'December': 12};
-        let globalData = []; // Simpan data asli di sini
-        let filteredData = []; // Data yang sedang ditampilkan
+        let globalData = [];
+        let filteredData = [];
 
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
             document.getElementById('fileNameDisp').innerText = file.name;
-            document.getElementById('fileStatus').innerText = "File Berhasil Diupload!";
+            document.getElementById('fileStatus').innerText = "DATABASE LOADED";
             
             const reader = new FileReader();
             reader.onload = (evt) => {
@@ -95,27 +120,49 @@
 
         function processInitialData(data) {
             const today = luxon.DateTime.now().startOf('day');
+            
             globalData = data.map(row => {
                 const day = parseInt(row['Anniversary day']);
                 const month = monthMap[row['Anniversary month']];
                 if (!day || !month) return null;
 
-                const bday = luxon.DateTime.fromObject({ year: today.year, month: month, day: day });
-                const h = today.diff(bday, 'days').days;
+                // Hitung Tanggal Ulang Tahun (Tahun Ini atau Tahun Depan jika sudah lewat)
+                let bday = luxon.DateTime.fromObject({ year: today.year, month: month, day: day });
+                if (bday < today) {
+                    bday = bday.plus({ years: 1 });
+                }
+
+                const diff = bday.diff(today, 'days').days;
 
                 let status = "";
-                if (h === 0) status = "Hari Ini";
-                else if (h >= -3 && h <= -1) status = "Segera Follow Up";
-                else if (h === 1 || (h >= -7 && h <= -4)) status = "Potensi Birthday";
+                if (diff === 0) status = "TODAY";
+                else if (diff > 0 && diff <= 7) status = "THIS WEEK";
+                else if (diff > 7 && diff <= 30) status = "THIS MONTH";
 
-                return status ? { ...row, h_val: h, calculatedStatus: status } : null;
+                return status ? { 
+                    ...row, 
+                    h_val: Math.floor(diff), 
+                    calculatedStatus: status,
+                    formattedDate: `${day} ${row['Anniversary month']}`
+                } : null;
             }).filter(x => x !== null);
 
+            // Urutkan berdasarkan yang terdekat (h_val terkecil)
+            globalData.sort((a, b) => a.h_val - b.h_val);
+
+            updateStats();
             showView();
             renderTable();
         }
 
+        function updateStats() {
+            document.getElementById('count-today').innerText = globalData.filter(d => d.calculatedStatus === "TODAY").length;
+            document.getElementById('count-week').innerText = globalData.filter(d => d.calculatedStatus === "THIS WEEK").length;
+            document.getElementById('count-month').innerText = globalData.filter(d => d.calculatedStatus === "THIS MONTH").length;
+        }
+
         function showView() {
+            document.getElementById('statsArea').classList.remove('hidden');
             document.getElementById('controls').classList.remove('hidden');
             document.getElementById('tableContainer').classList.remove('hidden');
             document.getElementById('downloadArea').classList.remove('hidden');
@@ -142,14 +189,23 @@
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-slate-50 transition-colors";
                     tr.innerHTML = `
-                        <td class="px-6 py-4 font-bold text-slate-800">${row.Name}</td>
-                        <td class="px-6 py-4 text-slate-600 font-mono text-sm">${row.Telephone || '-'}</td>
-                        <td class="px-6 py-4 text-slate-600 text-sm">${row['Anniversary day']} ${row['Anniversary month']}</td>
-                        <td class="px-6 py-4">
-                            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${getStatusClass(row.calculatedStatus)}">${row.calculatedStatus}</span>
+                        <td class="px-8 py-5">
+                            <div class="font-black text-slate-800">${row.Name}</div>
+                            <div class="text-xs text-slate-400 font-mono">${row['Customer account'] || ''}</div>
                         </td>
-                        <td class="px-6 py-4 text-center">
-                            ${wa ? `<a href="https://wa.me/${wa}" target="_blank" class="bg-green-500 text-white p-2 rounded-lg text-xs hover:bg-green-600 inline-block">💬 Chat</a>` : '-'}
+                        <td class="px-8 py-5 text-center font-black text-blue-600">
+                            ${row.h_val === 0 ? 'H-0' : 'H-' + row.h_val}
+                        </td>
+                        <td class="px-8 py-5 text-slate-500 font-medium text-sm">
+                            ${row.formattedDate}
+                        </td>
+                        <td class="px-8 py-5">
+                            <span class="px-3 py-1 rounded-lg text-[10px] font-black tracking-widest ${getStatusClass(row.calculatedStatus)}">
+                                ${row.calculatedStatus}
+                            </span>
+                        </td>
+                        <td class="px-8 py-5 text-center">
+                            ${wa ? `<a href="https://wa.me/${wa}" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all inline-block shadow-md">WHATSAPP</a>` : '<span class="text-slate-300">-</span>'}
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -158,28 +214,28 @@
         }
 
         function getStatusClass(status) {
-            if (status === "Hari Ini") return "bg-emerald-100 text-emerald-700";
-            if (status === "Segera Follow Up") return "bg-amber-100 text-amber-700";
-            return "bg-indigo-100 text-indigo-700";
+            if (status === "TODAY") return "bg-rose-100 text-rose-600";
+            if (status === "THIS WEEK") return "bg-amber-100 text-amber-600";
+            return "bg-blue-100 text-blue-600";
         }
 
-        // Fitur Download Excel
         function downloadExcel() {
-            if (filteredData.length === 0) return alert("Tidak ada data untuk didownload");
+            if (filteredData.length === 0) return alert("Tidak ada data untuk diekspor");
             
-            // Hapus properti internal h_val dan calculatedStatus untuk hasil download yang bersih
-            const exportData = filteredData.map(({ h_val, calculatedStatus, ...rest }) => ({
-                ...rest,
-                'Status Birthday': calculatedStatus
+            const exportData = filteredData.map(({ h_val, calculatedStatus, formattedDate, ...rest }) => ({
+                'Name': rest.Name,
+                'WhatsApp': rest.Telephone,
+                'Birthday': formattedDate,
+                'H-Days': h_val,
+                'Category': calculatedStatus
             }));
 
             const worksheet = XLSX.utils.json_to_sheet(exportData);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Birthday_Report");
-            XLSX.writeFile(workbook, `Birthday_Report_${luxon.DateTime.now().toFormat('yyyy-MM-dd')}.xlsx`);
+            XLSX.writeFile(workbook, `CRM_Birthday_${luxon.DateTime.now().toFormat('yyyy-MM-dd')}.xlsx`);
         }
 
-        // Event Listeners untuk Filter
         document.getElementById('searchInput').addEventListener('input', renderTable);
         document.getElementById('statusFilter').addEventListener('change', renderTable);
     </script>
